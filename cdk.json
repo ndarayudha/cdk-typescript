@@ -1,5 +1,5 @@
 {
-  "app": "npx ts-node --prefer-ts-exts bin/service.ts",
+  "app": "node index",
   "watch": {
     "include": [
       "**"
@@ -13,7 +13,8 @@
       "package*.json",
       "yarn.lock",
       "node_modules",
-      "test"
+      "test",
+      "packages/*"
     ]
   },
   "context": {
