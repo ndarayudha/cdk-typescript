@@ -1,5 +1,6 @@
 import * as AWS from "aws-sdk";
 import { v4 as uuidv4 } from "uuid";
+import { dbClient } from "../database/dynamodb";
 
 const TABLE_NAME = process.env.TABLE_NAME || "";
 const PRIMARY_KEY = process.env.PRIMARY_KEY || "";
