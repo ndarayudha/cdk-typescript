@@ -13,8 +13,7 @@
       "package*.json",
       "yarn.lock",
       "node_modules",
-      "test",
-      "packages/*"
+      "test"
     ]
   },
   "context": {

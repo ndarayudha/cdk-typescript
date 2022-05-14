@@ -5,4 +5,4 @@ import { ProductStack } from './lib/productStack';
 
 
 const app = new cdk.App();
-new ProductStack(app, 'ProductStack');
+new ProductStack(app, 'DevProductStack');

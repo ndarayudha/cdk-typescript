@@ -11,14 +11,14 @@ const RESERVED_RESPONSE = `Error: You're using AWS reserved keywords as attribut
 
 export const handler = async (event: any = {}): Promise<any> => {
   if (!event.body) {
-    return {
-      statusCode: 400,
-      body: "invalid request, you are missing the parameter body",
-    };
+    return buildResponse(400, {
+      message: "invalid request, you are missing the parameter body",
+    });
   }
   const item =
     typeof event.body == "object" ? event.body : JSON.parse(event.body);
   item[PRIMARY_KEY] = uuidv4();
+
   const params = {
     TableName: TABLE_NAME,
     Item: item,
@@ -26,7 +26,7 @@ export const handler = async (event: any = {}): Promise<any> => {
 
   try {
     await db.put(params).promise();
-    return { statusCode: 201, body: "" };
+    return buildResponse(201, { product: item });
   } catch (dbError: any) {
     const errorResponse =
       dbError.code === "ValidationException" &&
@@ -36,3 +36,13 @@ export const handler = async (event: any = {}): Promise<any> => {
     return { statusCode: 500, body: errorResponse };
   }
 };
+
+function buildResponse(statusCode: number, body: Object) {
+  return {
+    statusCode: statusCode,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  };
+}

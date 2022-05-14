@@ -10,25 +10,26 @@ const db = new AWS.DynamoDB.DocumentClient();
 
 export const handler = async (event: any = {}): Promise<any> => {
   if (!event.body) {
-    return {
-      statusCode: 400,
-      body: "invalid request, you are missing the parameter body",
-    };
+    return buildResponse(400, {
+      message: "invalid request, you are missing the parameter body",
+    });
   }
 
   const editedItemId = event.pathParameters.id;
   if (!editedItemId) {
-    return {
-      statusCode: 400,
-      body: "invalid request, you are missing the path parameter id",
-    };
+    return buildResponse(400, {
+      message: "invalid request, you are missing the path parameter id",
+    });
   }
 
   const editedItem: any =
     typeof event.body == "object" ? event.body : JSON.parse(event.body);
   const editedItemProperties = Object.keys(editedItem);
+
   if (!editedItem || editedItemProperties.length < 1) {
-    return { statusCode: 400, body: "invalid request, no arguments provided" };
+    return buildResponse(400, {
+      message: "invalid request, no arguments provided",
+    });
   }
 
   const firstProperty = editedItemProperties.splice(0, 1);
@@ -50,8 +51,14 @@ export const handler = async (event: any = {}): Promise<any> => {
   });
 
   try {
-    await db.update(params).promise();
-    return { statusCode: 204, body: "" };
+    const response = await db.update(params).promise();
+    const body = {
+      Operation: "UPDATE",
+      Message: "SUCCESS",
+      UpdatedAttributes: response,
+    };
+    console.log(response);
+    return buildResponse(200, body);
   } catch (dbError: any) {
     const errorResponse =
       dbError.code === "ValidationException" &&
@@ -61,3 +68,13 @@ export const handler = async (event: any = {}): Promise<any> => {
     return { statusCode: 500, body: errorResponse };
   }
 };
+
+function buildResponse(statusCode: number, body: Object) {
+  return {
+    statusCode: statusCode,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  };
+}
